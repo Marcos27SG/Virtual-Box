@@ -12,11 +12,9 @@ import org.virtualbox_6_1.VirtualBoxManager;
  */
 public class test {
     public static void main(String[] args) {
-		// Create a new instance of VirtualBoxManager
-		// Param 1 = homeName
 		VirtualBoxManager virtualBoxManager = VirtualBoxManager.createInstance(null);
 		virtualMachine awesomeMachine = new virtualMachine();
-		// Setting some variables
+		
 
 		boolean ws = false;
 		String url = "http://localhost:18083";
@@ -56,7 +54,7 @@ public class test {
 			e.printStackTrace();
 		}
 
-		// process system event queue
+
 		virtualBoxManager.waitForEvents(0);
 		if (ws) {
 			try {
@@ -75,7 +73,6 @@ public class test {
 		long end = System.currentTimeMillis() + waitMillis;
 		boolean isItTime = false;
 		while (!isItTime) {
-//			System.out.println(System.currentTimeMillis() );
 			if (System.currentTimeMillis() >= end)
 				isItTime = true;
 

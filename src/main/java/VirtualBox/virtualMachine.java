@@ -31,12 +31,11 @@ public class virtualMachine {
 	public void createVMbeta(VirtualBoxManager virtualBoxManager, IVirtualBox iVirtualBox) {
 
 		ISession session = virtualBoxManager.getSessionObject();
-		// Before creating, first delete if exist another machine already created
 		deleteMachine(virtualBoxManager, iVirtualBox, session);
 
 		IMachine betaMachine = iVirtualBox.createMachine(null, nameMachine, null, null, null);
 
-		betaMachine.setMemorySize(1024L);
+		betaMachine.setMemorySize(2048L);
 		betaMachine.setOSTypeId("Fedora_64");
 
 		iVirtualBox.registerMachine(betaMachine);
@@ -44,27 +43,24 @@ public class virtualMachine {
 		betaMachine.lockMachine(session, LockType.Write);
 
 		IMachine sessionMachine = session.getMachine();
-		// IF SOMETHING GOES WRONG, THE MACHINE HAS TO BE UNLOCK!
+		
 		try {
                        
 			IMedium hardDisk = iVirtualBox.createMedium("vdi",
 					"E:\\Jala Marcos DevOps\\TestMachine\\HardDiskBetaMachine.vdi", AccessMode.ReadWrite,
 					DeviceType.HardDisk);
-//            IMedium hd = iVirtualBox.openMedium("C:\\Users\\Desktop\\VirtualBox VMs\\TestMachine\\TestMachineBeta.vdi", DeviceType.HardDisk, AccessMode.ReadWrite, Boolean.FALSE);
 			List<MediumVariant> mediumVariants = new ArrayList<MediumVariant>();
 
 			mediumVariants.add(MediumVariant.Standard);
-			// 15Gb
-
+			
 			IProgress iProgress = hardDisk.createBaseStorage(15L * 1024L * 1024L * 1024L, mediumVariants);
 			iProgress.waitForCompletion(-1);
 			Integer resultCode = iProgress.getResultCode();
-			System.out.println("COBE MESSAGE: ResultCode: " + resultCode);
+			System.out.println("Code Result: " + resultCode);
 			sessionMachine.addStorageController(nameHDController, StorageBus.SATA);
 
 			sessionMachine.attachDevice(nameHDController, 0, 0, DeviceType.HardDisk, hardDisk);
 
-			// For dvd Image
 			sessionMachine.addStorageController(nameDVDController, StorageBus.IDE);
 
 			IMedium dvdImage = iVirtualBox.openMedium(
@@ -72,11 +68,9 @@ public class virtualMachine {
 					AccessMode.ReadOnly, Boolean.FALSE);
 
 			sessionMachine.attachDevice(nameDVDController, 1, 0, DeviceType.DVD, dvdImage);
-//            sessionMachine.mountMedium("COBE DVD Controller", 1, 0, dvdImage, Boolean.FALSE);
 			sessionMachine.setBootOrder(1L, DeviceType.DVD);
 			sessionMachine.saveSettings();
 
-//            deleteMachine(virtualBoxManager, iVirtualBox, session);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -96,9 +90,9 @@ public class virtualMachine {
 			}
 			machineToDelete.deleteConfig(media);
 			System.out
-					.println("COBE MESSAGE: The previous machine '" + nameMachine + "' has been deleted successfully ");
+					.println("Name machine:" + nameMachine + "' has been deleted successfully ");
 		} catch (Exception e) {
-			System.out.println("COBE MESSAGE: Couldn't find machine " + e.getMessage());
+			System.out.println("Couldn't find machine " + e.getMessage());
 		}
 	}
 
@@ -143,19 +137,11 @@ public class virtualMachine {
 		 * above, to prevent conflicting changes from other processes; this is why
 		 * opening another session will fail while the VM is running.)
 		 */
-		// Param 1 session object
-		// param 2 session type
-		// Param 3 possibly environment setting
+	
 		IProgress launchVMProcess = cobe.launchVMProcess(session, "gui", env);
-//	        IProgress p = iMachine.launchVMProcess(session, "gui", env);
-		// give the proces 10 secs
 		System.out.println("launching Vm!");
 		launchVMProcess.waitForCompletion(-1);
-//	        progressStatus(virtualBoxManager, p, 10000);
 
-//	        session.unlockMachine();
-		// process system event queue
-//	        virtualBoxManager.waitForEvents(0);
 	}
 
 	public void turnOff_VM(VirtualBoxManager virtualBoxManager, IVirtualBox vbox) {
